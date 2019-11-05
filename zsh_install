@@ -1,0 +1,35 @@
+#!/bin/bash
+# Install zsh oh my zsh and plugins
+
+zsh_install(){
+    yum install -y python git wget curl zsh
+}
+
+oh_my_zsh_install(){
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+    sed -i '3i ZSH_DISABLE_COMPFIX=true' ~/.zshrc 
+    echo "oh my zsh installed!"
+    chsh -s /bin/zsh  # centos
+    sleep 5
+}
+
+plugins_install(){
+    cd ~ && git clone git://github.com/joelthelion/autojump.git     # 安装autojunp插件，使用j +目录 可以跳转，详情查看github
+    cd ~/autojump/ && ./install.sh
+    sed -i '66a [[ -s ~/.autojump/etc/profile.d/autojump.sh ]] && source ~/.autojump/etc/profile.d/autojump.sh\nautoload -U compinit && compinit -u' ~/.zshrc
+    cd ~/.oh-my-zsh/plugins
+    git clone git://github.com/zsh-users/zsh-syntax-highlighting.git  #安装高亮插件
+    git clone https://github.com/zsh-users/zsh-autosuggestions        #安装自动判断插件
+    sed -ir 's#(git)#(\n\tgit\n\tzsh-autosuggestions\n\tzsh-syntax-highlighting\n)#g' ~/.zshrc  #加载高亮插件和自动判断插件
+    sed -i '$a source ~/.oh-my-zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh' ~/.zshrc
+    source ~/.zshrc
+}
+
+
+main(){
+    zsh_install
+    oh_my_zsh_install
+    plugins_install
+}
+
+main
